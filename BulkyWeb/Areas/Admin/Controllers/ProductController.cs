@@ -29,7 +29,12 @@ namespace BulkyBookWeb.Areas.Admin.Controllers
         public IActionResult Index()
         {
             List<Product> objProductList = _unitOfWork.Product.GetAll(includeProperties:"Category").ToList();
-          
+            //  List<Product> objProductList = _unitOfWork.Product.GetAll().ToList();
+            foreach (var product in objProductList)
+            {
+                Console.WriteLine($"Title: {product.Title}, Category: {product.Category?.Name}");
+            }
+
             return View(objProductList);
         }
 

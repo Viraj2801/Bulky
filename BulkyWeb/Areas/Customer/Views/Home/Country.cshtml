@@ -1,0 +1,99 @@
+﻿@using Bulkey.Models;
+
+@model List<Country>
+
+
+
+
+<h2>Select your Known Languages:</h2>
+
+@*<form method="post" asp-controller="Home" asp-action="Country" >*@
+    <select id="itemSelect" class="select2" style="width: 100%;" >
+        <option value=""></option>
+
+        @*  @foreach(var country in Model)
+        {
+        <option value="@country.Name">@country.Name</option> 
+        }*@
+
+    </select>
+
+<input type="datetime-local" id="datetime-picker">
+<br />
+@*<input type="time" id="timepicker" name="Time" />
+<br />*@
+
+
+<table id="businessHoursTable">
+    <tr>
+        <th>Time</th>
+        <th>Opening Time</th>
+        <th>Closing Time</th>
+    </tr>
+    <tr>
+        <td>BusinessHours</td>
+        <td><input type="text" class="opening-time" id="opening-time" /></td>
+        <td><input type="text" class="closing-time" id="closing-time" /></td>
+    </tr>
+    
+ 
+</table>
+<br />
+
+    @* <input @(Model.Name.Any(x => x == ) "checked":"") type="checkbox"    id="english" name="languages" value="English">*@
+    <input type="checkbox" id="english" name="languages" value="English">
+    <label for="english">English</label><br>
+
+    <input type="checkbox" id="hindi" name="languages" value="Hindi">
+    <label for="hindi">Hindi</label><br>
+
+    <input type="checkbox" id="spanish" name="languages" value="Spanish">
+    <label for="spanish">Spanish</label><br>
+
+    <input type="checkbox" id="french" name="languages" value="French">
+    <label for="french">French</label><br>
+
+    <input type="checkbox" id="portuguese" name="languages" value="Portuguese">
+    <label for="portuguese">Portuguese</label><br>
+
+    <input type="checkbox" id="japanese" name="languages" value="Japanese">
+    <label for="japanese">Japanese</label><br>
+
+    <input type="checkbox" id="italian" name="languages" value="Italian">
+    <label for="Italian">italian</label><br>
+
+    <input type="checkbox" id="german" name="languages" value="German">
+    <label for="german">German</label><br>
+
+
+  
+
+
+
+   
+    <div class="col-12" >
+        <button   id="submit" class="w-100 btn btn-lg btn-primary">Submit</button>
+    </div>
+  
+@*</form>*@
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+
+
+
+
+@section Scripts{
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="~/js/country.js"></script>
+
+
+
+
+}
+

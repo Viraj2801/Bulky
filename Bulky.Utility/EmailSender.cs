@@ -29,5 +29,16 @@ namespace Bulky.Utility
             var message = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
             return client.SendEmailAsync(message);
         }
+
+
+
+        //public Task SendEmailAsync(string email, string subject, string htmlContent)
+        //{
+        //    var client = new SendGridClient(SendGridSecret);
+        //    var from = new EmailAddress("viraj@techbeeconsulting.com", "Bulk Book");
+        //    var to = new EmailAddress(email);
+        //    var message = MailHelper.CreateSingleEmail(from, to, subject, "", htmlContent);
+        //    return client.SendEmailAsync(message);
+        //}
     }
 }

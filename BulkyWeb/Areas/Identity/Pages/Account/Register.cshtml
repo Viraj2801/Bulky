@@ -71,6 +71,9 @@
                         <label asp-for="Input.PostalCode" class="ms-2 text-muted">Postal Code</label>
                         <span asp-validation-for="Input.PostalCode" class="text-danger"></span>
                     </div>
+
+
+
                     @if (User.IsInRole(SD.Role_Admin))
                     {
                         <div class="form-floating mb-3 col-md-6">
@@ -84,6 +87,38 @@
                             </select>
                         </div>
                     }
+
+
+                        <h2>Select your Known Languages:</h2>
+
+                        <form>
+                            <input type="checkbox" asp-for="Input.Name" checked :"" id="english" name="languages" value="English">
+                            <label for="english">English</label><br>
+
+                            <input type="checkbox" id="hindi" name="languages" value="Hindi">
+                            <label for="hindi">Hindi</label><br>
+
+                            <input type="checkbox" id="spanish" name="languages" value="Spanish">
+                            <label for="spanish">Spanish</label><br>
+
+                            <input type="checkbox" id="french" name="languages" value="French">
+                            <label for="french">French</label><br>
+
+                            <input type="checkbox" id="portuguese" name="languages" value="Portuguese">
+                            <label for="portuguese">Portuguese</label><br>
+
+                            <input type="checkbox" id="japanese" name="languages" value="Japanese">
+                            <label for="japanese">Japanese</label><br>
+
+                            <input type="checkbox" id="italian" name="languages" value="Italian">
+                            <label for="Italian">italian</label><br>
+
+                            <input type="checkbox" id="german" name="languages" value="German">
+                            <label for="german">German</label><br>
+
+                        </form>
+
+
                     <div class="col-12">
                     <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
                     </div>

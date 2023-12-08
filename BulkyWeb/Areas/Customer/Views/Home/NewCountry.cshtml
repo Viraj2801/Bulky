@@ -1,0 +1,79 @@
+﻿@using Bulkey.Models;
+@*@using BulkyBook.Models;*@
+@model Country
+
+
+<form method="post" asp-asp-controller="Home" asp-action="NewCountry">
+    <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" asp-for="Name"/>
+
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+</form>
+
+
+
+
+@*
+<select id="itemSelect" class="select2" style="width: 100%;">
+    <option value=""></option>
+
+
+</select>
+
+
+
+<h2>Select your Known Languages:</h2>
+
+<form>*@
+    @* <input @(Model.Name.Any(x => x == ) "checked":"") type="checkbox"    id="english" name="languages" value="English">*@
+ @*   <input type="checkbox" id="english" name="languages" value="English">
+    <label for="english">English</label><br>
+
+    <input type="checkbox" id="hindi" name="languages" value="Hindi">
+    <label for="hindi">Hindi</label><br>
+
+    <input type="checkbox" id="spanish" name="languages" value="Spanish">
+    <label for="spanish">Spanish</label><br>
+
+    <input type="checkbox" id="french" name="languages" value="French">
+    <label for="french">French</label><br>
+
+    <input type="checkbox" id="portuguese" name="languages" value="Portuguese">
+    <label for="portuguese">Portuguese</label><br>
+
+    <input type="checkbox" id="japanese" name="languages" value="Japanese">
+    <label for="japanese">Japanese</label><br>
+
+    <input type="checkbox" id="italian" name="languages" value="Italian">
+    <label for="Italian">italian</label><br>
+
+    <input type="checkbox" id="german" name="languages" value="German">
+    <label for="german">German</label><br>
+
+    <form method="post" asp-controller="Home" asp-action="NewCountry">
+    <div class="col-12" >
+        <button  type="submit" class="w-100 btn btn-lg btn-primary">Submit</button>
+    </div>
+    </form>
+</form>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+
+*@
+
+
+@*
+
+@section Scripts{
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    <script src="~/js/country.js"></script>
+}
+
+*@

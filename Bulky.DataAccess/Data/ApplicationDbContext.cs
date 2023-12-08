@@ -24,6 +24,8 @@ namespace BulkyBook.DataAcess.Data
 
         public DbSet<OrderDetail> OrderDetails { get; set; }
 
+        public DbSet<Country>Countries { get; set; }
+
 
 
 

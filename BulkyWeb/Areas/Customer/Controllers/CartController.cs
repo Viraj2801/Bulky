@@ -5,8 +5,12 @@ using BulkyBook.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Stripe.Checkout;
 using System.Security.Claims;
+using System.Text;
 
 namespace BulkyWeb.Areas.Customer.Controllers
 {
@@ -16,14 +20,16 @@ namespace BulkyWeb.Areas.Customer.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEmailSender _emailSender;
+        private readonly IServiceProvider _serviceProvider;
+
 
         [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
-        public CartController(IUnitOfWork unitOfWork,IEmailSender emailSender)
+        public CartController(IUnitOfWork unitOfWork,IEmailSender emailSender, IServiceProvider serviceProvider)
         {
             _unitOfWork = unitOfWork;
             _emailSender = emailSender;
-
+            _serviceProvider = serviceProvider;
 
         }
 
@@ -182,12 +188,52 @@ namespace BulkyWeb.Areas.Customer.Controllers
             return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartVM.OrderHeader.Id });
         }
 
+        //public IActionResult OrderConfirmation(int id)
+        //{
+        //    OrderHeader orderHeader=_unitOfWork.OrderHeader.Get(u=>u.Id == id,includeProperties:"ApplicationUser");
+        //    if (orderHeader.PaymentStatus!=SD.PaymentStatusDelayedPayment)
+        //    {
+        //        //this is an order by customer
+        //        var service = new SessionService();
+        //        Session session = service.Get(orderHeader.SessionId);
+
+        //        if (session.PaymentStatus.ToLower() == "paid")
+        //        {
+        //            _unitOfWork.OrderHeader.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
+        //            _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+        //            _unitOfWork.Save();
+        //        }
+        //        HttpContext.Session.Clear();
+
+        //    }
+
+        //    _emailSender.SendEmailAsync(orderHeader.ApplicationUser.Email, "New Order - Bulky Book",
+        //        $"<p>New Order Created {orderHeader.Id}</p>");
+
+
+
+
+        //    List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
+        //    _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
+        //    _unitOfWork.Save();
+
+        //    return View(id);
+        //}
+
+
+
+
+        // Add this method in your CartController
+        // Add this method in your CartController
+
+
         public IActionResult OrderConfirmation(int id)
         {
-            OrderHeader orderHeader=_unitOfWork.OrderHeader.Get(u=>u.Id == id,includeProperties:"ApplicationUser");
-            if (orderHeader.PaymentStatus!=SD.PaymentStatusDelayedPayment)
+            OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser");
+
+            if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
             {
-                //this is an order by customer
+                // this is an order by the customer
                 var service = new SessionService();
                 Session session = service.Get(orderHeader.SessionId);
 
@@ -198,13 +244,39 @@ namespace BulkyWeb.Areas.Customer.Controllers
                     _unitOfWork.Save();
                 }
                 HttpContext.Session.Clear();
-
             }
 
-            _emailSender.SendEmailAsync(orderHeader.ApplicationUser.Email, "New Order - Bulky Book",
-                $"<p>New Order Created {orderHeader.Id}</p>");
+            ShoppingCartVM = new()
+            {
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId,
+              includeProperties: "Product"),
+                OrderHeader = new()
+            };
+            ShoppingCartVM.OrderHeader.OrderTotal = ShoppingCartVM.ShoppingCartList.Sum(cart => cart.Count * cart.Product.Price);
 
+            //SendOrderConfirmationEmail(orderHeader);
+            //var shoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId, includeProperties: "Product").ToList();
 
+            //// Create an HTML message with detailed product information
+            //StringBuilder htmlMessage = new StringBuilder();
+            //htmlMessage.AppendLine("<p>Your Order has Confirm:</p>");
+            //htmlMessage.AppendLine("<ul>");
+
+            //foreach (var cart in shoppingCartList)
+            //{
+            //    htmlMessage.AppendLine($"<li>Product: {cart.Product.Title}, Quantity: {cart.Count}, Price: {cart.Product.Price}, Total: {cart.Count * cart.Product.Price} </li>");
+            //}
+            //htmlMessage.AppendLine($"<li>Total Order Amount: {orderHeader.OrderTotal}</li>");
+            //htmlMessage.AppendLine($"<li>Product deliver's in this Address:{orderHeader.StreetAddress},{orderHeader.City},{orderHeader.State},{orderHeader.PostalCode}</li>");
+
+            //htmlMessage.AppendLine("</ul>");
+
+            //_emailSender.SendEmailAsync(orderHeader.ApplicationUser.Email, "New Order - Bulky Book", htmlMessage.ToString());
+
+            string emailSubject = "New Order - Bulky Book";
+            string emailBody = RenderRazorViewToString("OrderConfirmationEmail", ShoppingCartVM);
+
+            _emailSender.SendEmailAsync(orderHeader.ApplicationUser.Email, emailSubject, emailBody);
 
 
             List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
@@ -213,6 +285,117 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
             return View(id);
         }
+        private string RenderRazorViewToString(string viewName, object model)
+        {
+            ViewData.Model = model;
+
+            using (var sw = new StringWriter())
+            {
+                var engine = _serviceProvider.GetRequiredService<IRazorViewEngine>();
+                var viewResult = engine.FindView(ControllerContext, viewName, false);
+
+                var viewContext = new ViewContext(
+                    ControllerContext,
+                    viewResult.View,
+                    ViewData,
+                    TempData,
+                    sw,
+                    new HtmlHelperOptions()
+                );
+
+                viewResult.View.RenderAsync(viewContext).Wait();
+
+                return sw.GetStringBuilder().ToString();
+            }
+        }
+
+        //public IActionResult OrderConfirmation(int id)
+        //{
+        //    OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser,ShoppingCartList.Product");
+
+        //    if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
+        //    {
+        //        // this is an order by the customer
+        //        var service = new SessionService();
+        //        Session session = service.Get(orderHeader.SessionId);
+
+        //        if (session.PaymentStatus.ToLower() == "paid")
+        //        {
+        //            _unitOfWork.OrderHeader.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
+        //            _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+        //            _unitOfWork.Save();
+        //        }
+        //        HttpContext.Session.Clear();
+        //    }
+
+        //    ShoppingCartVM = new()
+        //    {
+        //        ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId,
+        //            includeProperties: "Product"),
+
+        //        OrderHeader = new()
+        //    };
+
+        //    // SendOrderConfirmationEmail(orderHeader);
+        //    SendOrderConfirmationEmail(orderHeader);
+
+        //    List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
+        //    _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
+        //    _unitOfWork.Save();
+
+        //    return View(id);
+        //}
+
+        //private void SendOrderConfirmationEmail(OrderHeader orderHeader)
+        //{
+        //    var emailSubject = "Order Confirmation - Bulky Book";
+        //    var emailTemplatePath = "OrderConfirmationEmail.cshtml";
+
+        //    // Render the CSHTML template
+        //    var emailBody = RenderRazorViewToString(emailTemplatePath, orderHeader);
+
+        //    // Send the email
+        //    var userEmail = orderHeader.ApplicationUser.Email;
+        //    _emailSender.SendEmailAsync(userEmail, emailSubject, emailBody);
+        //}
+
+        //private string RenderRazorViewToString(string viewName, object model)
+        //{
+        //    ViewData.Model = model;
+
+        //    using (var sw = new StringWriter())
+        //    {
+        //        var engine = _serviceProvider.GetRequiredService<IRazorViewEngine>();
+        //        var viewResult = engine.FindView(ControllerContext, viewName, false);
+
+        //        var viewContext = new ViewContext(
+        //            ControllerContext,
+        //            viewResult.View,
+        //            ViewData,
+        //            TempData,
+        //            sw,
+        //            new HtmlHelperOptions()
+        //        );
+
+        //        viewResult.View.RenderAsync(viewContext).Wait();
+
+        //        return sw.GetStringBuilder().ToString();
+        //    }
+        //}
+
+        //private void SendOrderConfirmationEmail(OrderHeader orderHeader)
+        //{
+        //    var emailSubject = "Order Confirmation - Bulky Book";
+        //    var emailBody = "OrderConfirmationEmail.cshtml"; 
+
+        //    var userEmail = orderHeader.ApplicationUser.Email;
+        //    _emailSender.SendEmailAsync(userEmail, emailSubject, emailBody);
+        //}
+
+
+
+
+
 
         public IActionResult Plus(int cartId)
         {

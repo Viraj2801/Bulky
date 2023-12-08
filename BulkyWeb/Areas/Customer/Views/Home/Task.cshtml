@@ -1,0 +1,46 @@
+﻿<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Select2 DEMO</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(".accountSelect").select2({
+                minimumInputLength: 2,
+                ajax: {
+                    url: '/home/getall',
+                    data: function (params) {
+                        return {
+                            q: params.term// search term
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.items
+                        }
+                    },
+                }
+            });
+        });
+    </script>
+    <style>
+        body {
+            margin: auto;
+            width: 600px;
+            padding: 50px;
+        }
+
+        .accountSelect {
+            width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <form method="post">
+        <select class="accountSelect"></select>
+    </form>
+
+</body>
+</html>

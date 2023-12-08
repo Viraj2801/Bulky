@@ -14,5 +14,6 @@ namespace Bulkey.Models.ViewModels
         public IEnumerable<SelectListItem> CompanyList { get; set; }
 
 
+
     }
 }

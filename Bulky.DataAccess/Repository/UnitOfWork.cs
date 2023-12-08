@@ -19,9 +19,12 @@ namespace BulkyBook.DataAccess.Repository
         public IOrderHeaderRepository OrderHeader { get; private set; }
         public IOrderDetailRepository OrderDetail { get; private set; }
         public IProductImageRepository ProductImage { get; private set; }
+
+        public ICountryRepository Country { get; private set; }
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
+            Country = new CountryRepository(_db);
             ProductImage = new ProductImageRepository(_db);
             ApplicationUser= new ApplicationUserRepository(_db);
             ShoppingCart = new ShoppingCartRepository(_db);
